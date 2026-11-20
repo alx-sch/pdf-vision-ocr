@@ -10,17 +10,14 @@
   <strong>Extract structured, machine-readable text from complex PDFs using vision language models.</strong>
 </p>
 
-A CLI tool that turns PDFs into rich text — preserving tables, describing diagrams, and
-capturing content that traditional OCR tools miss entirely. Born from real-world work with
-dense clinical guidelines and multi-format HR documents, where "good enough" text extraction
-simply wasn't good enough.
+A versatile CLI tool for any domain or project that needs to turn complex PDFs into rich, structured text—preserving tables, describing diagrams, and capturing visual context that traditional OCR misses entirely. Originally built to prepare dense clinical guidelines and multi-format HR documents for downstream AI agents, it excels anywhere "good enough" text extraction simply isn't good enough.
 
-- **Provider-agnostic** — works with OpenAI, Azure OpenAI, or any compatible endpoint
-- **Structure-aware** — tables become markdown, flowcharts become decision trees, figures get described
-- **Batch processing** — extract hundreds of PDFs with progress tracking, ETA, and resume on interruption
-- **Handwriting & scans** — vision models read handwritten notes, stamps, and scanned documents natively
-- **Orientation correction** — detects and fixes rotated or upside-down pages automatically
-- **Zero training required** — no model fine-tuning, no OCR engine config, no language packs
+- **Provider-agnostic** — supports OpenAI, Azure OpenAI, and any OpenAI-compatible endpoint
+- **Structure-aware** — turns tables into Markdown, flowcharts into decision trees, and figures into text descriptions
+- **Resilient batching** — handles hundreds of PDFs with progress bars, ETAs, and checkpointed resume
+- **Handwriting & scans** — natively extracts handwritten notes, stamps, and scanned pages
+- **Auto-orientation** — detects and corrects sideways or upside-down pages before extraction
+- **Zero configuration** — no fine-tuning, OCR engine tuning, or language packs needed
 
 ---
 

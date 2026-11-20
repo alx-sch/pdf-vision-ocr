@@ -302,8 +302,7 @@ The nested "Men" / "Women" sub-headers under "NT-proBNP (pg/mL)" are flattened i
 self-contained column names — every cell value is unambiguously tied to its row and column.
 This is **real output**, not a handcrafted example.
 
-For a flowchart extraction example (`[DIAGRAM]`), see the [model comparison above](#why-docvision-uses-cloud-vlms-anyway) —
-it shows the same paper's diagnostic flowchart alongside DocVision's full structured output.
+For a flowchart extraction example (`[DIAGRAM]`), see the [model comparison above](#why-docvision-uses-cloud-vlms-anyway).
 
 <div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
 

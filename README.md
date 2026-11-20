@@ -25,6 +25,7 @@ A versatile CLI tool for any domain or project that needs to turn complex PDFs i
 
 - [Why This Exists](#why-this-exists)
 - [Vision OCR vs. Classical OCR](#vision-ocr-vs-classical-ocr)
+- [Choosing a Vision Model](#choosing-a-vision-model)
 - [What Gets Extracted](#what-gets-extracted)
 - [Getting Started](#getting-started)
 - [Usage](#usage)
@@ -118,6 +119,92 @@ is a one-time cost.
 | Speed | ★★★★★ (~50ms/page) | ★★☆☆☆ (~15s/page) |
 | Cost per page | Free | ~$0.01–0.03 |
 | Setup complexity | High (engines, language packs) | None (API key only) |
+
+<div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
+
+---
+
+## Choosing a Vision Model
+
+Not all vision models are created equal for document extraction — and the most powerful
+model isn't necessarily the best choice. This section explains why.
+
+### Why GPT-4o is the default
+
+GPT-4o hits the sweet spot for this task: strong vision comprehension, fast response times,
+and the lowest cost per page among frontier models. Document OCR is a *perception* task
+more than a *reasoning* task — the model needs to accurately read what's on the page, not
+solve a novel problem. That means the extra reasoning capacity of more powerful models goes
+largely unused.
+
+### The model landscape for document extraction
+
+| Model | Vision | OCR quality | Speed | Cost/page | Best for |
+|:------|:------:|:-----------:|:-----:|:---------:|:---------|
+| **GPT-4o** | ✓ | ★★★★★ | ~15s | ~$0.01 | **Default choice** — best quality-to-cost ratio |
+| **GPT-4o mini** | ✓ | ★★★★☆ | ~5s | ~$0.003 | Large batches where speed/cost matter more than perfect accuracy |
+| **Claude Opus** | ✓ | ★★★★★ | ~25s | ~$0.05 | Overkill — superb reasoning, but OCR doesn't need it |
+| **Claude Sonnet** | ✓ | ★★★★☆ | ~15s | ~$0.01 | Good alternative to GPT-4o |
+| **Gemini 2.5 Pro** | ✓ | ★★★★☆ | ~10s | ~$0.01 | Fast, competitive quality |
+| **Gemini 2.5 Flash** | ✓ | ★★★☆☆ | ~4s | ~$0.002 | Budget option for clean printed PDFs |
+
+### Why frontier reasoning models are overkill
+
+Models like Claude Opus, o3, or GPT-4.5 are designed for complex multi-step reasoning —
+writing code, solving math problems, crafting nuanced arguments. They're significantly
+more expensive ($0.03–0.08 per page) and slower. For document extraction, that extra
+reasoning capacity buys you almost nothing:
+
+- **Reading a table** requires accurate perception, not chain-of-thought reasoning
+- **Transcribing text** is pattern matching, not problem solving
+- **Describing a flowchart** needs spatial understanding, which GPT-4o already handles well
+
+The one exception: if your documents contain highly ambiguous content (degraded
+handwriting, faded ink, overlapping stamps) where the model needs to *infer* what a
+character might be from context, a stronger model may produce marginally better results.
+But for 95% of document extraction work, GPT-4o is the right tool.
+
+### What about PaddleOCR and specialized OCR models?
+
+PaddleOCR<sup><a href="#footnote4">[4]</a></sup>, EasyOCR, and similar projects are
+*classical* OCR engines — they detect text regions, segment characters, and classify
+them. They're not vision language models. The comparison:
+
+```
+  PaddleOCR / EasyOCR / Tesseract          Vision LLM (GPT-4o, Sonnet, etc.)
+  ─────────────────────────────────         ──────────────────────────────────
+  ✓ Free, runs locally                     ✗ API cost per page
+  ✓ Fast (~50ms/page)                      ✗ Slow (~15s/page)
+  ✓ No internet required                   ✗ Requires API access
+  ✗ Text only — no structure               ✓ Tables, diagrams, figures
+  ✗ Language packs, config tuning          ✓ Zero config
+  ✗ Handwriting needs specialized models   ✓ Reads handwriting natively
+  ✗ Can't describe what a figure means     ✓ Semantic understanding
+```
+
+There is no "PaddleOCR vision model" — PaddleOCR is fundamentally a different approach.
+Some newer OCR projects like GOT-OCR<sup><a href="#footnote5">[5]</a></sup> and
+Nougat<sup><a href="#footnote6">[6]</a></sup> use transformer architectures for document
+understanding, but they're specialized for specific formats (academic papers, receipts)
+and don't match the general-purpose quality of frontier vision LLMs on diverse document
+types.
+
+**Bottom line:** Use GPT-4o for quality, GPT-4o mini for volume, and don't pay for Opus
+unless you're doing something with the extracted text that requires its reasoning — at
+which point, use GPT-4o for extraction and Opus for analysis.
+
+### Switching models
+
+```bash
+# Use GPT-4o mini for a large batch (3x cheaper, 3x faster)
+python extract.py --model gpt-4o-mini large-batch/*.pdf
+
+# Use Claude Sonnet via a compatible proxy
+python extract.py --api-base https://my-proxy.com/v1 --model claude-sonnet-4-20250514 docs/*.pdf
+
+# Use Gemini via a compatible gateway
+python extract.py --api-base https://my-gateway.com/v1 --model gemini-2.5-flash docs/*.pdf
+```
 
 <div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
 
@@ -453,7 +540,7 @@ they slot into any downstream workflow:
 
 ```
   ┌──────────┐     ┌─────────────────┐     ┌──────────────────────┐
-  │  PDFs    │────▶│  pdf-vision-ocr │────▶│  Structured .txt     │
+  │  PDFs    │────▶│   DocVision     │────▶│  Structured .txt     │
   │          │     │  (this tool)    │     │  files               │
   └──────────┘     └─────────────────┘     └──────────┬───────────┘
                                                       │
@@ -516,4 +603,7 @@ with a simple `grep -A 20 '\[RECOMMENDATION\]' extracted/*.txt`.
 
 <a name="footnote1">[1]</a> Smith, R. (2007). *An Overview of the Tesseract OCR Engine.* Proc. Ninth Int. Conference on Document Analysis and Recognition (ICDAR). <a href="https://doi.org/10.1109/ICDAR.2007.4376991" target="_blank">doi:10.1109/ICDAR.2007.4376991</a><br>
 <a name="footnote2">[2]</a> OpenAI. (2024). *GPT-4o System Card.* <a href="https://cdn.openai.com/gpt-4o-system-card.pdf" target="_blank">cdn.openai.com/gpt-4o-system-card.pdf</a><br>
-<a name="footnote3">[3]</a> OpenAI. (2024). *Vision — OpenAI API Documentation.* <a href="https://platform.openai.com/docs/guides/vision" target="_blank">platform.openai.com/docs/guides/vision</a>
+<a name="footnote3">[3]</a> OpenAI. (2024). *Vision — OpenAI API Documentation.* <a href="https://platform.openai.com/docs/guides/vision" target="_blank">platform.openai.com/docs/guides/vision</a><br>
+<a name="footnote4">[4]</a> Du, Y. et al. (2020). *PP-OCR: A Practical Ultra Lightweight OCR System.* <a href="https://arxiv.org/abs/2009.09941" target="_blank">arxiv.org/abs/2009.09941</a><br>
+<a name="footnote5">[5]</a> Wei, H. et al. (2024). *General OCR Theory: Towards OCR-2.0 via a Unified End-to-End Model.* <a href="https://arxiv.org/abs/2409.01704" target="_blank">arxiv.org/abs/2409.01704</a><br>
+<a name="footnote6">[6]</a> Blecher, L. et al. (2023). *Nougat: Neural Optical Understanding for Academic Documents.* <a href="https://arxiv.org/abs/2308.13418" target="_blank">arxiv.org/abs/2308.13418</a>

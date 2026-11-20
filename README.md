@@ -203,7 +203,11 @@ would be perfectly adequate. The differentiator is the `[DIAGRAM]`, `[TABLE]`,
 `[RECOMMENDATION]`, and `[FIGURE]` annotations that make the output *useful to downstream
 LLMs and search systems*.
 
-Consider what happens when the model encounters a clinical decision flowchart:
+Consider what happens when the model encounters a clinical decision flowchart<sup><a href="#footnote8">[8]</a></sup>:
+
+<p align="center">
+  <img src=".assets/flowchart.png" width="500" alt="NT-proBNP diagnostic flowchart" />
+</p>
 
 ```
   PaddleOCR-VL (0.9B)                     GPT-4o (~200B+)

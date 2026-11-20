@@ -461,14 +461,14 @@ OPENAI_MODEL=gpt-4o
 The extraction pipeline has three stages:
 
 ```
-  PDF file
-    │
-    ▼
+          PDF file
+             │
+             ▼
 ┌─────────────────────────────────────┐
 │  1. RENDER                          │
 │                                     │
 │  Each page → high-resolution PNG    │
-│  (pymupdf at 2x scale = ~300 DPI)  │
+│  (pymupdf at 2x scale = ~300 DPI)   │
 └─────────────┬───────────────────────┘
               │
               ▼

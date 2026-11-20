@@ -34,6 +34,7 @@ A versatile CLI tool for any domain or project that needs to turn complex PDFs i
 - [Handling Rotated Pages](#handling-rotated-pages)
 - [Building a Knowledge Base](#building-a-knowledge-base)
 - [Limitations](#limitations)
+- [Troubleshooting](#troubleshooting)
 - [References](#references)
 
 ---
@@ -631,6 +632,109 @@ with a simple `grep -A 20 '\[RECOMMENDATION\]' extracted/*.txt`.
 - **No layout coordinates** — Unlike classical OCR (which provides bounding boxes), this
   tool outputs text only. If you need spatial coordinates for overlay or annotation, a
   classical OCR tool may be more appropriate.
+
+<div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
+
+---
+
+## Troubleshooting
+
+### `The read operation timed out`
+
+The API didn't respond within the timeout window (default: 300 seconds). This typically
+happens on pages with very dense content — a full-page abbreviations table with 100+ rows,
+for example, takes the vision model significantly longer to process than a page of running
+text.
+
+**What to check:**
+- Is the page unusually dense? Large tables, multi-column layouts, and pages packed with
+  fine print take longer to process.
+- Is your network stable? A slow or unstable connection to the API endpoint compounds the
+  issue.
+
+**Fix:** The tool's resume feature means you don't lose progress — it skips already-extracted
+files on re-run. Just run the same command again and only the failed file will be retried.
+If the same page fails repeatedly, the page content likely exceeds what the model can return
+within the timeout at the current `--max-tokens` setting.
+
+### `[Errno 8] nodename nor servname provided, or not known`
+
+DNS resolution failed — the machine couldn't look up the API endpoint's hostname. This
+usually means your network connection dropped during a long batch run.
+
+**What to check:**
+- VPN still connected? Long extraction runs (hours) often outlast a VPN session.
+- Wi-Fi/ethernet still up? Check with `ping 8.8.8.8`.
+
+**Fix:** Restore your network connection and re-run. The tool skips completed files
+automatically, so you pick up exactly where it failed.
+
+### `401 Unauthorized` / `403 Forbidden`
+
+The API rejected your credentials.
+
+**What to check:**
+- Is `--api-key` set (or `$OPENAI_API_KEY` exported)?
+- Has the key expired or been rotated?
+- Does the key have access to the model you specified? Some endpoints restrict which
+  models a key can use.
+- For corporate/proxy endpoints: is `--ca-cert` pointed at the right CA bundle?
+
+### `429 Too Many Requests` / Rate limit errors
+
+You're hitting the API's rate limit — too many requests per minute.
+
+**What to check:**
+- Are you running multiple extraction processes in parallel? Each page is one API call;
+  a 200-page PDF fires 200 sequential calls.
+- Check your API plan's rate limits (tokens per minute and requests per minute).
+
+**Fix:** Wait a minute and re-run. The tool resumes from where it stopped. For persistent
+rate limiting, process fewer PDFs at once.
+
+### Truncated output on dense pages
+
+If a page's extracted text looks cut off mid-sentence, the model hit the per-page token
+limit.
+
+**What to check:**
+- Open the `.txt` file and look for pages that end abruptly — especially pages with large
+  tables or dense two-column layouts.
+
+**Fix:** Increase the token budget:
+
+```bash
+python extract.py --max-tokens 8192 --force dense-document.pdf
+```
+
+The `--force` flag re-extracts even if the output file already exists.
+
+### Empty or near-empty output file
+
+The extraction completed but the `.txt` file is suspiciously small or empty.
+
+**What to check:**
+- Is the PDF image-based or text-based? Run `python -c "import pymupdf; doc = pymupdf.open('file.pdf'); print(len(doc))"` 
+  to confirm it has pages.
+- Is the PDF password-protected? pymupdf will open it but render blank pages.
+- Are the pages mostly images with very little text? The output will be proportionally short.
+
+### Corporate networks and SSL errors
+
+If you're behind a corporate proxy or firewall, you may see SSL certificate errors
+(`SSLCertVerificationError`, `CERTIFICATE_VERIFY_FAILED`).
+
+**Fix:** Point to your corporate CA bundle:
+
+```bash
+python extract.py --ca-cert /path/to/corporate-ca-bundle.pem docs/*.pdf
+```
+
+Or set it permanently:
+
+```bash
+export SSL_CA_CERT=/path/to/corporate-ca-bundle.pem
+```
 
 <div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
 

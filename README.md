@@ -75,28 +75,28 @@ Vision OCR flips this entirely. Instead of building text from pixels, it *unders
 page as a whole* — the same way a human reader does.
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────┐
 │                      Classical OCR Pipeline                      │
 │                                                                  │
-│  Image → Binarize → Detect regions → Segment chars → Classify   │
+│  Image → Binarize → Detect regions → Segment chars → Classify    │
 │    → Assemble words → Output text                                │
 │                                                                  │
-│  ✗ No understanding of what a "table" or "flowchart" is         │
+│  ✗ No understanding of what a "table" or "flowchart" is          │
 │  ✗ Each character is an independent classification problem       │
 │  ✗ Layout is inferred from coordinates, often incorrectly        │
 │  ✗ Handwriting requires specialized models per script            │
-└─────────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────────┘
 
-┌─────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────┐
 │                      Vision OCR (this tool)                      │
 │                                                                  │
-│  Image → Vision LLM (sees entire page at once) → Structured text│
+│  Image → Vision LLM (sees entire page at once) → Structured text │
 │                                                                  │
 │  ✓ Understands tables, diagrams, charts as semantic objects      │
 │  ✓ Reads handwriting, stamps, mixed fonts in one pass            │
 │  ✓ Preserves relationships ("this value belongs to that column") │
 │  ✓ Can describe what a figure *means*, not just its labels       │
-└─────────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 The key insight: a vision language model like GPT-4o doesn't just *read* the page — it

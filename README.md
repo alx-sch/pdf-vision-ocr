@@ -365,33 +365,12 @@ That's it. Output lands in `<input-dir>/extracted/` by default.
 
 ## Usage
 
-```
-usage: extract.py [-h] [-o OUTPUT] [--api-base API_BASE] [--api-key API_KEY]
-                  [--model MODEL] [--max-tokens MAX_TOKENS]
-                  [--ca-cert CA_CERT] [--force]
-                  files [files ...]
-
-Extract text from PDFs using a vision LLM (OpenAI-compatible API).
-
-positional arguments:
-  files                 PDF files to extract
-
-optional arguments:
-  -o, --output          Output directory (default: <input-dir>/extracted/)
-  --api-base            API base URL (default: $OPENAI_API_BASE or https://api.openai.com/v1)
-  --api-key             API key (default: $OPENAI_API_KEY)
-  --model               Vision model name (default: $OPENAI_MODEL or gpt-4o)
-  --max-tokens          Max tokens per page response (default: 4096)
-  --ca-cert             Path to custom CA certificate bundle (default: $SSL_CA_CERT)
-  --fix-orientation     Detect and correct rotated/upside-down pages (extra API call per page)
-  --force               Re-extract even if output file already exists
-```
-
-### Examples
-
 ```bash
-# OpenAI (default)
-python extract.py --api-key $OPENAI_API_KEY guidelines/*.pdf
+# With .env configured, just point at your PDFs
+python extract.py guidelines/*.pdf
+
+# Different model (cheaper/faster for large batches)
+python extract.py --model gpt-4o-mini large-batch/*.pdf
 
 # Azure OpenAI
 python extract.py \
@@ -399,7 +378,7 @@ python extract.py \
   --api-key $AZURE_OPENAI_KEY \
   reports/*.pdf
 
-# Any OpenAI-compatible endpoint (LiteLLM, vLLM, local proxy, etc.)
+# Any OpenAI-compatible endpoint (LiteLLM, vLLM, Ollama, etc.)
 python extract.py \
   --api-base http://localhost:8000/v1 \
   --api-key $KEY \
@@ -408,14 +387,17 @@ python extract.py \
 
 # Corporate network with custom CA certificate
 python extract.py \
-  --api-base https://internal-api.company.com/v1 \
-  --api-key $CORP_KEY \
   --ca-cert /path/to/corporate-ca-bundle.pem \
   contracts/*.pdf
 
-# Re-extract everything (ignore cached results)
+# Fix rotated/upside-down scans (extra API call per page)
+python extract.py --fix-orientation scanned-hr-files/*.pdf
+
+# Re-extract everything (overwrite existing output)
 python extract.py --force research-papers/*.pdf
 ```
+
+Run `python extract.py --help` for the full list of flags.
 
 ### Progress tracking
 

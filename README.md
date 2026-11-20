@@ -304,12 +304,7 @@ self-contained column names. No ambiguity for downstream processing.
 
 **Example — a clinical flowchart becomes a decision tree:**
 
-<p align="center">
-  <img src=".assets/flowchart.png" width="550" alt="NT-proBNP diagnostic flowchart for outpatient heart failure" />
-  <br><span>Figure 2 from Bayes-Genis et al. (2023)<sup><a href="#footnote8">[8]</a></sup> — a diagnostic flowchart for suspected <i>de novo</i> heart failure in outpatients.</span>
-</p>
-
-*DocVision extracts both the raw text and the structural description:*
+Using the same NT-proBNP flowchart from the [model comparison above](#why-docvision-uses-cloud-vlms-anyway), here is DocVision's full extraction output:
 
 ```
 [DIAGRAM]

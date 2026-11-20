@@ -282,25 +282,25 @@ Every page produces verbatim text plus structured annotations for visual element
 
 **Example — a nested table becomes unambiguous markdown:**
 
-*Original PDF table:*
-```
-                    NT-proBNP (pg/mL)
-                    Men         Women
-<60 years           >75         >125
-60–69 years         >125        >175
-```
+<p align="center">
+  <img src=".assets/table.png" width="500" alt="NT-proBNP age- and sex-adjusted rule-in thresholds" />
+  <br><span>Table 1 from Bayes-Genis et al. (2023)<sup><a href="#footnote8">[8]</a></sup> — age- and sex-adjusted NT-proBNP thresholds with nested column headers.</span>
+</p>
 
-*Extracted output:*
+*DocVision's extracted output:*
 ```markdown
 [TABLE]
-| Age Group   | NT-proBNP Men (pg/mL) | NT-proBNP Women (pg/mL) |
+| Age group   | NT-proBNP Men (pg/mL) | NT-proBNP Women (pg/mL) |
 |-------------|------------------------|--------------------------|
 | <60 years   | >75                    | >125                     |
 | 60–69 years | >125                   | >175                     |
+| 70–79 years | >175                   | >225                     |
+| >80 years   | >250                   | >250                     |
 ```
 
 The nested "Men" / "Women" sub-headers under "NT-proBNP (pg/mL)" are flattened into
-self-contained column names. No ambiguity for downstream processing.
+self-contained column names — every cell value is unambiguously tied to its row and column.
+This is **real output**, not a handcrafted example.
 
 **Example — a clinical flowchart becomes a decision tree:**
 

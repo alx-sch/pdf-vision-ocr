@@ -164,34 +164,87 @@ handwriting, faded ink, overlapping stamps) where the model needs to *infer* wha
 character might be from context, a stronger model may produce marginally better results.
 But for 95% of document extraction work, GPT-4o is the right tool.
 
-### What about PaddleOCR and specialized OCR models?
+### What about local and open-source alternatives?
 
-PaddleOCR<sup><a href="#footnote4">[4]</a></sup>, EasyOCR, and similar projects are
-*classical* OCR engines — they detect text regions, segment characters, and classify
-them. They're not vision language models. The comparison:
+The document extraction landscape has evolved significantly. Beyond classical OCR engines
+(Tesseract, EasyOCR), there are now open-source vision-language models specifically built
+for document understanding. Here's the honest picture:
+
+**Classical OCR engines** — Tesseract, PaddleOCR (base), EasyOCR:
 
 ```
-  PaddleOCR / EasyOCR / Tesseract          Vision LLM (GPT-4o, Sonnet, etc.)
-  ─────────────────────────────────         ──────────────────────────────────
-  ✓ Free, runs locally                     ✗ API cost per page
-  ✓ Fast (~50ms/page)                      ✗ Slow (~15s/page)
-  ✓ No internet required                   ✗ Requires API access
-  ✗ Text only — no structure               ✓ Tables, diagrams, figures
-  ✗ Language packs, config tuning          ✓ Zero config
-  ✗ Handwriting needs specialized models   ✓ Reads handwriting natively
-  ✗ Can't describe what a figure means     ✓ Semantic understanding
+  ✓ Free, runs locally, fast (~50ms/page)
+  ✗ Text only — no semantic understanding of tables, diagrams, or figures
+  ✗ Language packs and config tuning required
+  ✗ Handwriting needs specialized models per script
 ```
 
-There is no "PaddleOCR vision model" — PaddleOCR is fundamentally a different approach.
-Some newer OCR projects like GOT-OCR<sup><a href="#footnote5">[5]</a></sup> and
-Nougat<sup><a href="#footnote6">[6]</a></sup> use transformer architectures for document
-understanding, but they're specialized for specific formats (academic papers, receipts)
-and don't match the general-purpose quality of frontier vision LLMs on diverse document
-types.
+These are fundamentally character-recognition pipelines. They read glyphs, not pages.
 
-**Bottom line:** Use GPT-4o for quality, GPT-4o mini for volume, and don't pay for Opus
-unless you're doing something with the extracted text that requires its reasoning — at
-which point, use GPT-4o for extraction and Opus for analysis.
+**Document-specialized VLMs** — a newer category that combines vision models with
+document-specific training:
+
+| Model | Size | License | Strengths |
+|:------|:-----|:--------|:----------|
+| **PaddleOCR-VL 1.6**<sup><a href="#footnote4">[4]</a></sup> | ~0.9B | Apache 2.0 | Tables, formulas, charts, stamps/seals, skewed scans; runs on laptop |
+| **GOT-OCR 2.0**<sup><a href="#footnote5">[5]</a></sup> | ~0.6B | Apache 2.0 | End-to-end document understanding; sheet music, molecular formulas |
+| **Nougat**<sup><a href="#footnote6">[6]</a></sup> | ~0.3B | MIT | Academic papers → structured markdown; excellent on LaTeX-heavy content |
+| **Florence-2**<sup><a href="#footnote7">[7]</a></sup> | ~0.7B | MIT | General vision tasks including OCR; Microsoft Research |
+
+These are real, capable tools. PaddleOCR-VL in particular handles tables, stamps, and
+skewed scans well — and it's completely free. So why doesn't DocVision use them?
+
+### Why DocVision uses cloud VLMs anyway
+
+The short answer: **structured descriptions require reasoning, not just perception.**
+
+DocVision's key feature isn't raw text extraction — for that, PaddleOCR-VL or GOT-OCR
+would be perfectly adequate. The differentiator is the `[DIAGRAM]`, `[TABLE]`,
+`[RECOMMENDATION]`, and `[FIGURE]` annotations that make the output *useful to downstream
+LLMs and search systems*.
+
+Consider what happens when the model encounters a clinical decision flowchart:
+
+```
+  PaddleOCR-VL (0.9B)                     GPT-4o (~200B+)
+  ────────────────────                     ─────────────────
+  Reads text in each box:                  Understands the decision logic:
+                                           
+  "Rule-out"                               "This is a diagnostic flowchart.
+  "≤ 125pg/mL"                             NT-proBNP ≤ 125pg/mL rules out
+  "Heart Failure Very Unlikely"            heart failure. Values between
+  "Grey zone"                              125 and the age-adjusted threshold
+  "Age-adjusted Rule-in"                   are a grey zone. Above the threshold,
+  ...                                      heart failure is likely, and the
+                                           patient should receive echo within
+                                           6 weeks..."
+```
+
+A 0.9B model can *read* the boxes. A frontier model can *explain* what the flowchart
+*means* — the relationships between nodes, the decision logic, and the clinical
+implications. That explanation is what makes the extracted text useful for RAG systems,
+clinical Q&A, and knowledge bases.
+
+The same applies to tables: PaddleOCR-VL can detect table cells, but flattening nested
+multi-level headers into self-contained column names (e.g., "NT-proBNP Men (pg/mL)")
+requires understanding what the header hierarchy *means* — a reasoning task that small
+models handle inconsistently.
+
+### When to use what
+
+| Use case | Best tool | Why |
+|:---------|:----------|:----|
+| Bulk text extraction (invoices, receipts, forms) | PaddleOCR-VL / GOT-OCR | Free, fast, accuracy is sufficient |
+| Offline / air-gapped environments | PaddleOCR-VL | No internet needed |
+| Academic papers → structured text | Nougat | Purpose-built, excellent on LaTeX |
+| Complex documents needing semantic understanding | **DocVision (GPT-4o)** | Only frontier VLMs produce the structured descriptions |
+| Budget-sensitive large batches | GPT-4o mini or Gemini Flash | Cloud quality at reduced cost |
+| Maximum extraction quality | **DocVision (GPT-4o)** | Best general-purpose document comprehension |
+
+**Bottom line:** Local document VLMs are excellent for *reading*. Cloud frontier VLMs are
+necessary for *understanding*. DocVision targets the latter — when the extracted text needs
+to be rich enough for an LLM to reason over, not just searchable. If all you need is the
+raw text, PaddleOCR-VL is the smarter (and free) choice.
 
 ### Switching models
 
@@ -606,4 +659,5 @@ with a simple `grep -A 20 '\[RECOMMENDATION\]' extracted/*.txt`.
 <a name="footnote3">[3]</a> OpenAI. (2024). *Vision — OpenAI API Documentation.* <a href="https://platform.openai.com/docs/guides/vision" target="_blank">platform.openai.com/docs/guides/vision</a><br>
 <a name="footnote4">[4]</a> Du, Y. et al. (2020). *PP-OCR: A Practical Ultra Lightweight OCR System.* <a href="https://arxiv.org/abs/2009.09941" target="_blank">arxiv.org/abs/2009.09941</a><br>
 <a name="footnote5">[5]</a> Wei, H. et al. (2024). *General OCR Theory: Towards OCR-2.0 via a Unified End-to-End Model.* <a href="https://arxiv.org/abs/2409.01704" target="_blank">arxiv.org/abs/2409.01704</a><br>
-<a name="footnote6">[6]</a> Blecher, L. et al. (2023). *Nougat: Neural Optical Understanding for Academic Documents.* <a href="https://arxiv.org/abs/2308.13418" target="_blank">arxiv.org/abs/2308.13418</a>
+<a name="footnote6">[6]</a> Blecher, L. et al. (2023). *Nougat: Neural Optical Understanding for Academic Documents.* <a href="https://arxiv.org/abs/2308.13418" target="_blank">arxiv.org/abs/2308.13418</a><br>
+<a name="footnote7">[7]</a> Xiao, B. et al. (2024). *Florence-2: Advancing a Unified Representation for a Variety of Vision Tasks.* <a href="https://arxiv.org/abs/2311.06242" target="_blank">arxiv.org/abs/2311.06242</a>

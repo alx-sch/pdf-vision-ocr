@@ -19,6 +19,7 @@ simply wasn't good enough.
 - **Structure-aware** — tables become markdown, flowcharts become decision trees, figures get described
 - **Batch processing** — extract hundreds of PDFs with progress tracking, ETA, and resume on interruption
 - **Handwriting & scans** — vision models read handwritten notes, stamps, and scanned documents natively
+- **Orientation correction** — detects and fixes rotated or upside-down pages automatically
 - **Zero training required** — no model fine-tuning, no OCR engine config, no language packs
 
 ---
@@ -32,6 +33,7 @@ simply wasn't good enough.
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [How It Works](#how-it-works)
+- [Handling Rotated Pages](#handling-rotated-pages)
 - [Building a Knowledge Base](#building-a-knowledge-base)
 - [Limitations](#limitations)
 - [References](#references)
@@ -245,6 +247,7 @@ optional arguments:
   --model               Vision model name (default: $OPENAI_MODEL or gpt-4o)
   --max-tokens          Max tokens per page response (default: 4096)
   --ca-cert             Path to custom CA certificate bundle (default: $SSL_CA_CERT)
+  --fix-orientation     Detect and correct rotated/upside-down pages (extra API call per page)
   --force               Re-extract even if output file already exists
 ```
 
@@ -389,6 +392,57 @@ label is readable to the model.
 **Why PNG and not the raw PDF?** The OpenAI vision API accepts images, not PDFs. Rendering
 to PNG at 2x scale (~300 DPI) preserves fine print while keeping file sizes reasonable
 (typically 200–500 KB per page).
+
+<div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
+
+---
+
+## Handling Rotated Pages
+
+Scanned documents often contain pages that are rotated 90°, 180°, or upside down — a
+common reality with batch-scanned HR files, faxed documents, and multi-source PDFs. The
+tool handles this at two levels:
+
+**1. Prompt-based (always on, free)**
+
+The OCR prompt includes an instruction to read the page in its correct orientation
+regardless of how it's displayed. Vision models are generally good at this — GPT-4o
+can read upside-down and sideways text. This handles most cases without any extra cost.
+
+**2. Detection pre-pass (`--fix-orientation`)**
+
+For documents where you know the scans are messy, add `--fix-orientation`. This sends a
+low-cost API call per page that asks the model: *"Is this page rotated? By how many
+degrees?"* If rotation is detected, the page image is physically rotated before the
+main extraction call — giving the vision model a clean, upright image to work with.
+
+```bash
+# Scanned HR files with mixed orientations
+python extract.py --fix-orientation scanned-documents/*.pdf
+```
+
+When a page is corrected, you'll see it in the progress output:
+
+```
+  [██████░░░░░░░░░░░░░░░░░░░░░░░░] 12/50 pages (24%)  |  page 3/8  |  ETA 12m  (rotated 90°)
+```
+
+**The tradeoff:** `--fix-orientation` doubles the API calls (and thus cost and time) for
+every page. Use it when you know the input quality is poor. For clean digital PDFs or
+well-scanned documents, the default prompt-based handling is sufficient.
+
+```
+                     Default                      --fix-orientation
+  ┌──────────┐    ┌───────────┐               ┌───────────────────┐
+  │ PDF page │───▶│ Render PNG│──▶ Extract     │ Render PNG (low)  │
+  └──────────┘    └───────────┘               │     │              │
+                                              │     ▼              │
+                                              │ "Rotated 90°"     │
+                                              │     │              │
+                                              │     ▼              │
+                                              │ Render PNG (fixed) │──▶ Extract
+                                              └───────────────────┘
+```
 
 <div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
 

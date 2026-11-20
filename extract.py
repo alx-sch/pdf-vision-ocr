@@ -18,8 +18,15 @@ DEFAULT_MODEL = "gpt-4o"
 DEFAULT_MAX_TOKENS = 4096
 RENDER_SCALE = 2.0
 
+ORIENTATION_PROMPT = (
+    "Is this page rotated or upside down? Reply with ONLY one of: "
+    "0, 90, 180, 270 — the degrees of clockwise rotation needed to make "
+    "the text upright. If the page is already upright, reply 0."
+)
+
 OCR_PROMPT = (
     "Extract all text from this image exactly as it appears. "
+    "If the page appears rotated or upside down, read it in its correct orientation. "
     "Preserve the original layout as closely as possible. "
     "If an area is visibly redacted or blacked out, write [REDACTED] in its place.\n\n"
     "If the image contains a table: after the extracted text, add a section "
@@ -77,12 +84,13 @@ def build_client(args: argparse.Namespace) -> httpx.Client:
     return httpx.Client(**kwargs)
 
 
-def vision_call(
+def _api_call(
     client: httpx.Client,
     api_base: str,
     api_key: str,
     model: str,
     img_bytes: bytes,
+    prompt: str,
     max_tokens: int,
 ) -> str:
     b64 = base64.b64encode(img_bytes).decode()
@@ -103,7 +111,7 @@ def vision_call(
                             "type": "image_url",
                             "image_url": {"url": f"data:image/png;base64,{b64}"},
                         },
-                        {"type": "text", "text": OCR_PROMPT},
+                        {"type": "text", "text": prompt},
                     ],
                 }
             ],
@@ -114,11 +122,39 @@ def vision_call(
     return resp.json()["choices"][0]["message"]["content"]
 
 
-def pdf_page_to_png(data: bytes, page_idx: int) -> bytes:
+def vision_call(
+    client: httpx.Client,
+    api_base: str,
+    api_key: str,
+    model: str,
+    img_bytes: bytes,
+    max_tokens: int,
+) -> str:
+    return _api_call(client, api_base, api_key, model, img_bytes, OCR_PROMPT, max_tokens)
+
+
+def detect_orientation(
+    client: httpx.Client,
+    api_base: str,
+    api_key: str,
+    model: str,
+    img_bytes: bytes,
+) -> int:
+    resp = _api_call(
+        client, api_base, api_key, model, img_bytes, ORIENTATION_PROMPT, 16
+    )
+    for token in resp.strip().split():
+        if token in ("0", "90", "180", "270"):
+            return int(token)
+    return 0
+
+
+def pdf_page_to_png(data: bytes, page_idx: int, rotation: int = 0) -> bytes:
     doc = fitz.open(stream=data, filetype="pdf")
     try:
         page = doc.load_page(page_idx)
-        pix = page.get_pixmap(matrix=fitz.Matrix(RENDER_SCALE, RENDER_SCALE))
+        mat = fitz.Matrix(RENDER_SCALE, RENDER_SCALE).prerotate(rotation)
+        pix = page.get_pixmap(matrix=mat)
         return pix.tobytes("png")
     finally:
         doc.close()
@@ -168,7 +204,16 @@ def extract_pdf(
         )
         print(status, end="", flush=True)
 
-        png = pdf_page_to_png(data, i)
+        rotation = 0
+        if args.fix_orientation:
+            low_res_png = pdf_page_to_png(data, i)
+            rotation = detect_orientation(
+                client, args.api_base, args.api_key, args.model, low_res_png
+            )
+            if rotation:
+                print(f" (rotated {rotation}°)", end="", flush=True)
+
+        png = pdf_page_to_png(data, i, rotation=rotation)
         text = vision_call(
             client, args.api_base, args.api_key, args.model, png, args.max_tokens
         ).strip()
@@ -223,6 +268,10 @@ examples:
     p.add_argument(
         "--ca-cert", default=os.getenv("SSL_CA_CERT"),
         help="Path to custom CA certificate bundle (default: $SSL_CA_CERT)",
+    )
+    p.add_argument(
+        "--fix-orientation", action="store_true",
+        help="Detect and correct rotated/upside-down pages (extra API call per page)",
     )
     p.add_argument(
         "--force", action="store_true",

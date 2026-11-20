@@ -1,0 +1,7 @@
+.env
+extracted/*.txt
+extracted/
+_progress.log
+__pycache__/
+*.pyc
+.venv/

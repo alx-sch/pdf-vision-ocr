@@ -187,10 +187,10 @@ document-specific training:
 
 | Model | Size | License | Strengths |
 |:------|:-----|:--------|:----------|
-| **PaddleOCR-VL 1.6**<sup><a href="#footnote4">[4]</a></sup> | ~0.9B | Apache 2.0 | Tables, formulas, charts, stamps/seals, skewed scans; runs on laptop |
-| **GOT-OCR 2.0**<sup><a href="#footnote5">[5]</a></sup> | ~0.6B | Apache 2.0 | End-to-end document understanding; sheet music, molecular formulas |
-| **Nougat**<sup><a href="#footnote6">[6]</a></sup> | ~0.3B | MIT | Academic papers → structured markdown; excellent on LaTeX-heavy content |
-| **Florence-2**<sup><a href="#footnote7">[7]</a></sup> | ~0.7B | MIT | General vision tasks including OCR; Microsoft Research |
+| **PaddleOCR-VL 1.6**<sup><a href="#footnote2">[2]</a></sup> | ~0.9B | Apache 2.0 | Tables, formulas, charts, stamps/seals, skewed scans; runs on laptop |
+| **GOT-OCR 2.0**<sup><a href="#footnote3">[3]</a></sup> | ~0.6B | Apache 2.0 | End-to-end document understanding; sheet music, molecular formulas |
+| **Nougat**<sup><a href="#footnote4">[4]</a></sup> | ~0.3B | MIT | Academic papers → structured markdown; excellent on LaTeX-heavy content |
+| **Florence-2**<sup><a href="#footnote5">[5]</a></sup> | ~0.7B | MIT | General vision tasks including OCR; Microsoft Research |
 
 These are real, capable tools. PaddleOCR-VL in particular handles tables, stamps, and
 skewed scans well — and it's completely free. So why doesn't DocVision use them?
@@ -204,7 +204,7 @@ would be perfectly adequate. The differentiator is the `[DIAGRAM]`, `[TABLE]`,
 `[RECOMMENDATION]`, and `[FIGURE]` annotations that make the output *useful to downstream
 LLMs and search systems*.
 
-Consider what happens when the model encounters a clinical decision flowchart<sup><a href="#footnote8">[8]</a></sup>:
+Consider what happens when the model encounters a clinical decision flowchart<sup><a href="#footnote6">[6]</a></sup>:
 
 <p align="center">
   <img src=".assets/flowchart.png" width="500" alt="NT-proBNP diagnostic flowchart" />
@@ -285,7 +285,7 @@ Every page produces verbatim text plus structured annotations for visual element
 
 <p align="center">
   <img src=".assets/table.png" width="500" alt="NT-proBNP age- and sex-adjusted rule-in thresholds" />
-  <br>Age- and sex-adjusted NT-proBNP thresholds with nested column headers.<sup><a href="#footnote8">[8]</a></span>
+  <br>Age- and sex-adjusted NT-proBNP thresholds with nested column headers.<sup><a href="#footnote6">[6]</a></span>
 </p>
 
 *DocVision's extracted output:*
@@ -716,10 +716,8 @@ export SSL_CA_CERT=/path/to/corporate-ca-bundle.pem
 ## References
 
 <a name="footnote1">[1]</a> Smith, R. (2007). *An Overview of the Tesseract OCR Engine.* Proc. Ninth Int. Conference on Document Analysis and Recognition (ICDAR). <a href="https://doi.org/10.1109/ICDAR.2007.4376991" target="_blank">doi:10.1109/ICDAR.2007.4376991</a><br>
-<a name="footnote2">[2]</a> OpenAI. (2024). *GPT-4o System Card.* <a href="https://cdn.openai.com/gpt-4o-system-card.pdf" target="_blank">cdn.openai.com/gpt-4o-system-card.pdf</a><br>
-<a name="footnote3">[3]</a> OpenAI. (2024). *Vision — OpenAI API Documentation.* <a href="https://platform.openai.com/docs/guides/vision" target="_blank">platform.openai.com/docs/guides/vision</a><br>
-<a name="footnote4">[4]</a> Du, Y. et al. (2020). *PP-OCR: A Practical Ultra Lightweight OCR System.* <a href="https://arxiv.org/abs/2009.09941" target="_blank">arxiv.org/abs/2009.09941</a><br>
-<a name="footnote5">[5]</a> Wei, H. et al. (2024). *General OCR Theory: Towards OCR-2.0 via a Unified End-to-End Model.* <a href="https://arxiv.org/abs/2409.01704" target="_blank">arxiv.org/abs/2409.01704</a><br>
-<a name="footnote6">[6]</a> Blecher, L. et al. (2023). *Nougat: Neural Optical Understanding for Academic Documents.* <a href="https://arxiv.org/abs/2308.13418" target="_blank">arxiv.org/abs/2308.13418</a><br>
-<a name="footnote7">[7]</a> Xiao, B. et al. (2024). *Florence-2: Advancing a Unified Representation for a Variety of Vision Tasks.* <a href="https://arxiv.org/abs/2311.06242" target="_blank">arxiv.org/abs/2311.06242</a><br>
-<a name="footnote8">[8]</a> Bayes-Genis, A. et al. (2023). *Practical algorithms for early diagnosis of heart failure and heart stress using NT-proBNP.* European Journal of Heart Failure, 25(11), 1891–1898. <a href="https://doi.org/10.1002/ejhf.3036" target="_blank">doi:10.1002/ejhf.3036</a>
+<a name="footnote2">[2]</a> Du, Y. et al. (2020). *PP-OCR: A Practical Ultra Lightweight OCR System.* <a href="https://arxiv.org/abs/2009.09941" target="_blank">arxiv.org/abs/2009.09941</a><br>
+<a name="footnote3">[3]</a> Wei, H. et al. (2024). *General OCR Theory: Towards OCR-2.0 via a Unified End-to-End Model.* <a href="https://arxiv.org/abs/2409.01704" target="_blank">arxiv.org/abs/2409.01704</a><br>
+<a name="footnote4">[4]</a> Blecher, L. et al. (2023). *Nougat: Neural Optical Understanding for Academic Documents.* <a href="https://arxiv.org/abs/2308.13418" target="_blank">arxiv.org/abs/2308.13418</a><br>
+<a name="footnote5">[5]</a> Xiao, B. et al. (2024). *Florence-2: Advancing a Unified Representation for a Variety of Vision Tasks.* <a href="https://arxiv.org/abs/2311.06242" target="_blank">arxiv.org/abs/2311.06242</a><br>
+<a name="footnote6">[6]</a> Bayes-Genis, A. et al. (2023). *Practical algorithms for early diagnosis of heart failure and heart stress using NT-proBNP.* European Journal of Heart Failure, 25(11), 1891–1898. <a href="https://doi.org/10.1002/ejhf.3036" target="_blank">doi:10.1002/ejhf.3036</a>

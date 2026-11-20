@@ -211,7 +211,7 @@ Consider what happens when the model encounters a clinical decision flowchart<su
 </p>
 
 ```
-  PaddleOCR-VL (0.9B)                     GPT-4o (~200B+)
+  PaddleOCR-VL (0.9B)                      GPT-4o (~200B+)
   ────────────────────                     ─────────────────
   Reads text in each box:                  Understands the decision logic:
                                            

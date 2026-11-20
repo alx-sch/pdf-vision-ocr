@@ -76,7 +76,7 @@ def progress_bar(current: int, total: int, width: int = 30) -> str:
 
 
 def build_client(args: argparse.Namespace) -> httpx.Client:
-    kwargs: dict = {"timeout": 120.0}
+    kwargs: dict = {"timeout": 300.0}
     if args.ca_cert:
         ctx = ssl.create_default_context()
         ctx.load_verify_locations(args.ca_cert)

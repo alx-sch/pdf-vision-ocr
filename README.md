@@ -285,13 +285,13 @@ Every page produces verbatim text plus structured annotations for visual element
 
 <p align="center">
   <img src=".assets/table.png" width="500" alt="NT-proBNP age- and sex-adjusted rule-in thresholds" />
-  <br><span>Table 1 from Bayes-Genis et al. (2023)<sup><a href="#footnote8">[8]</a></sup> — age- and sex-adjusted NT-proBNP thresholds with nested column headers.</span>
+  <br>Age- and sex-adjusted NT-proBNP thresholds with nested column headers.<sup><a href="#footnote8">[8]</a></span>
 </p>
 
 *DocVision's extracted output:*
 ```markdown
 [TABLE]
-| Age group   | NT-proBNP Men (pg/mL) | NT-proBNP Women (pg/mL) |
+| Age group   | NT-proBNP Men (pg/mL)  | NT-proBNP Women (pg/mL)  |
 |-------------|------------------------|--------------------------|
 | <60 years   | >75                    | >125                     |
 | 60–69 years | >125                   | >175                     |

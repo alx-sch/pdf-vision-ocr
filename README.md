@@ -302,41 +302,8 @@ The nested "Men" / "Women" sub-headers under "NT-proBNP (pg/mL)" are flattened i
 self-contained column names — every cell value is unambiguously tied to its row and column.
 This is **real output**, not a handcrafted example.
 
-**Example — a clinical flowchart becomes a decision tree:**
-
-Using the same NT-proBNP flowchart from the [model comparison above](#why-docvision-uses-cloud-vlms-anyway), here is DocVision's full extraction output:
-
-```
-[DIAGRAM]
-- Title: "Suspected de novo Heart Failure as an Outpatient (History, physical
-  exam, ECG)".
-- Central box: "NT-proBNP".
-- From this box, four branches based on NT-proBNP value:
-  1. "Rule-out ≤ 125 pg/mL".
-  2. "Grey zone".
-  3. "Age-adjusted Rule-in" with subcriteria:
-     - "<50 y: ≥ 125 pg/mL"
-     - "50–75 y: ≥ 250 pg/mL"
-     - "≥75 y: ≥ 500 pg/mL"
-  4. "High-risk Rule-in ≥ 2,000 pg/mL".
-- Under the rule-in thresholds, a note box: "Consider obesity, race-based
-  variations, and treatment (diuretics, RAS, MRA)".
-- Each of the four branches leads to a clinical action box:
-  - Rule-out → "Heart Failure Very Unlikely – Evaluation for non-cardiac cause
-    advised".
-  - Grey zone → "Heart Failure Most Likely – Consider alternative diagnosis.
-    If clinical suspicion remains, arrange echocardiography".
-  - Age-adjusted → "Heart Failure Likely – Treat as appropriate. Arrange for
-    echocardiography (≤ 6 weeks)".
-  - High-risk → "Heart Failure Very High-Risk – Priority echocardiography and
-    evaluation by Heart Failure team (≤ 2 weeks)".
-- Flow is linear from NT-proBNP measurement to classification to corresponding
-  recommended evaluation/treatment timing.
-```
-
-This is **real output** from DocVision — not a handcrafted example. An LLM reading this
-can answer questions about the decision logic, threshold values, and recommended timelines —
-something impossible from a flat text dump of the same flowchart.
+For a flowchart extraction example (`[DIAGRAM]`), see the [model comparison above](#why-docvision-uses-cloud-vlms-anyway) —
+it shows the same paper's diagnostic flowchart alongside DocVision's full structured output.
 
 <div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
 

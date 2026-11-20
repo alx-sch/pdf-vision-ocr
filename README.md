@@ -99,7 +99,7 @@ page as a whole* — the same way a human reader does.
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-The key insight: a vision language model like GPT-4o doesn't just *read* the page — it
+The key insight: a vision language model (VLM) like GPT-4o doesn't just *read* the page — it
 *comprehends* it. When it sees a table, it understands the relationship between headers
 and cells. When it sees a flowchart, it understands the decision logic. This comprehension
 is what makes the extracted text useful for downstream processing.

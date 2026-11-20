@@ -324,11 +324,25 @@ cd pdf-vision-ocr
 pip install -r requirements.txt
 ```
 
-### 2. Set your API key
+### 2. Configure
 
 ```bash
-export OPENAI_API_KEY="sk-..."
+cp .env.example .env
 ```
+
+Edit `.env` with your API key and (optionally) endpoint and model:
+
+```bash
+# Required
+OPENAI_API_KEY=sk-...
+
+# Optional — defaults shown
+OPENAI_API_BASE=https://api.openai.com/v1
+OPENAI_MODEL=gpt-4o
+```
+
+The tool loads `.env` automatically via `python-dotenv`. Alternatively, pass
+`--api-key`, `--api-base`, and `--model` as CLI flags.
 
 ### 3. Extract
 

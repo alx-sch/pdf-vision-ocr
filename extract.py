@@ -11,6 +11,12 @@ import sys
 import time
 from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 import httpx
 import pymupdf as fitz
 

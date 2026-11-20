@@ -41,7 +41,7 @@ A versatile CLI tool for any domain or project that needs to turn complex PDFs i
 
 This tool was built out of a specific need: extracting text from complex, real-world PDFs
 that classical OCR tools handle poorly. The documents that prompted it were clinical
-guidelines (ESC, ACC, ADA, KDIGO — hundreds of pages each) and HR personnel files
+guidelines with hundreds of pages each and HR personnel files
 (contracts, certificates, scanned letters, handwritten notes). These aren't clean,
 single-column journal articles. They contain:
 

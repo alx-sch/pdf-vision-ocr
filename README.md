@@ -518,49 +518,26 @@ to PNG at 2x scale (~300 DPI) preserves fine print while keeping file sizes reas
 ## Handling Rotated Pages
 
 Scanned documents often contain pages that are rotated 90°, 180°, or upside down — a
-common reality with batch-scanned HR files, faxed documents, and multi-source PDFs. The
-tool handles this at two levels:
+common reality with batch-scanned HR files, faxed documents, and multi-source PDFs.
 
-**1. Prompt-based (always on, free)**
+The extraction prompt already instructs the model to read pages in their correct
+orientation regardless of how they're displayed. GPT-4o is good at this — it handles
+sideways and upside-down text well. **For most documents, this is all you need.**
 
-The OCR prompt includes an instruction to read the page in its correct orientation
-regardless of how it's displayed. Vision models are generally good at this — GPT-4o
-can read upside-down and sideways text. This handles most cases without any extra cost.
-
-**2. Detection pre-pass (`--fix-orientation`)**
-
-For documents where you know the scans are messy, add `--fix-orientation`. This sends a
-low-cost API call per page that asks the model: *"Is this page rotated? By how many
-degrees?"* If rotation is detected, the page image is physically rotated before the
-main extraction call — giving the vision model a clean, upright image to work with.
+For severely degraded scans where the default handling isn't enough, there's an optional
+`--fix-orientation` flag. It sends a separate API call per page asking *"is this rotated?"*
+and physically rotates the PNG before the main extraction — giving the model a clean,
+upright image. In practice this is rarely needed; it's a safety net for the worst-case
+inputs.
 
 ```bash
-# Scanned HR files with mixed orientations
-python extract.py --fix-orientation scanned-documents/*.pdf
+# Only if the default extraction produces garbled output on rotated pages
+python extract.py --fix-orientation badly-scanned-files/*.pdf
 ```
 
-When a page is corrected, you'll see it in the progress output:
-
-```
-  [██████░░░░░░░░░░░░░░░░░░░░░░░░] 12/50 pages (24%)  |  page 3/8  |  ETA 12m  (rotated 90°)
-```
-
-**The tradeoff:** `--fix-orientation` doubles the API calls (and thus cost and time) for
-every page. Use it when you know the input quality is poor. For clean digital PDFs or
-well-scanned documents, the default prompt-based handling is sufficient.
-
-```
-                     Default                      --fix-orientation
-  ┌──────────┐    ┌───────────┐               ┌───────────────────┐
-  │ PDF page │───▶│ Render PNG│──▶ Extract     │ Render PNG (low)  │
-  └──────────┘    └───────────┘               │     │              │
-                                              │     ▼              │
-                                              │ "Rotated 90°"     │
-                                              │     │              │
-                                              │     ▼              │
-                                              │ Render PNG (fixed) │──▶ Extract
-                                              └───────────────────┘
-```
+Note that `--fix-orientation` doubles the API calls (and cost) for every page, since it
+adds a detection call before each extraction call. Don't use it by default — try without
+it first.
 
 <div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
 

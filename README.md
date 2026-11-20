@@ -300,25 +300,44 @@ self-contained column names. No ambiguity for downstream processing.
 
 **Example — a clinical flowchart becomes a decision tree:**
 
+<p align="center">
+  <img src=".assets/flowchart.png" width="550" alt="NT-proBNP diagnostic flowchart for outpatient heart failure" />
+  <br><span>Figure 2 from Bayes-Genis et al. (2023)<sup><a href="#footnote8">[8]</a></sup> — a diagnostic flowchart for suspected <i>de novo</i> heart failure in outpatients.</span>
+</p>
+
+*DocVision extracts both the raw text and the structural description:*
+
 ```
 [DIAGRAM]
-Figure 2 is a diagnostic flowchart for suspected de novo heart failure in outpatients:
-
-1. Top node: "NT-proBNP" with four branches:
-   - Left: "Rule-out ≤ 125pg/mL"
-   - Center-left: "Grey zone"
-   - Center-right: "Age-adjusted Rule-in <50y: ≥125; 50-74y: ≥250; ≥75y: ≥500 pg/mL"
-   - Right: "High-risk Rule-in ≥ 2,000pg/mL"
-
-2. Each branch leads to an outcome:
-   - Rule-out → "Heart Failure Very Unlikely — evaluate non-cardiac causes"
-   - Grey zone → "Heart Failure Not Likely — consider alternative diagnosis"
-   - Age-adjusted → "Heart Failure Likely — echocardiography within 6 weeks"
-   - High-risk → "Very High-Risk — priority echo and HF team within 2 weeks"
+- Title: "Suspected de novo Heart Failure as an Outpatient (History, physical
+  exam, ECG)".
+- Central box: "NT-proBNP".
+- From this box, four branches based on NT-proBNP value:
+  1. "Rule-out ≤ 125 pg/mL".
+  2. "Grey zone".
+  3. "Age-adjusted Rule-in" with subcriteria:
+     - "<50 y: ≥ 125 pg/mL"
+     - "50–75 y: ≥ 250 pg/mL"
+     - "≥75 y: ≥ 500 pg/mL"
+  4. "High-risk Rule-in ≥ 2,000 pg/mL".
+- Under the rule-in thresholds, a note box: "Consider obesity, race-based
+  variations, and treatment (diuretics, RAS, MRA)".
+- Each of the four branches leads to a clinical action box:
+  - Rule-out → "Heart Failure Very Unlikely – Evaluation for non-cardiac cause
+    advised".
+  - Grey zone → "Heart Failure Most Likely – Consider alternative diagnosis.
+    If clinical suspicion remains, arrange echocardiography".
+  - Age-adjusted → "Heart Failure Likely – Treat as appropriate. Arrange for
+    echocardiography (≤ 6 weeks)".
+  - High-risk → "Heart Failure Very High-Risk – Priority echocardiography and
+    evaluation by Heart Failure team (≤ 2 weeks)".
+- Flow is linear from NT-proBNP measurement to classification to corresponding
+  recommended evaluation/treatment timing.
 ```
 
-An LLM reading this can answer questions about the decision logic — something impossible
-from a flat text dump of the same flowchart.
+This is **real output** from DocVision — not a handcrafted example. An LLM reading this
+can answer questions about the decision logic, threshold values, and recommended timelines —
+something impossible from a flat text dump of the same flowchart.
 
 <div align="right"><b><a href="#table-of-contents">back to top</a></b></div>
 
@@ -660,4 +679,5 @@ with a simple `grep -A 20 '\[RECOMMENDATION\]' extracted/*.txt`.
 <a name="footnote4">[4]</a> Du, Y. et al. (2020). *PP-OCR: A Practical Ultra Lightweight OCR System.* <a href="https://arxiv.org/abs/2009.09941" target="_blank">arxiv.org/abs/2009.09941</a><br>
 <a name="footnote5">[5]</a> Wei, H. et al. (2024). *General OCR Theory: Towards OCR-2.0 via a Unified End-to-End Model.* <a href="https://arxiv.org/abs/2409.01704" target="_blank">arxiv.org/abs/2409.01704</a><br>
 <a name="footnote6">[6]</a> Blecher, L. et al. (2023). *Nougat: Neural Optical Understanding for Academic Documents.* <a href="https://arxiv.org/abs/2308.13418" target="_blank">arxiv.org/abs/2308.13418</a><br>
-<a name="footnote7">[7]</a> Xiao, B. et al. (2024). *Florence-2: Advancing a Unified Representation for a Variety of Vision Tasks.* <a href="https://arxiv.org/abs/2311.06242" target="_blank">arxiv.org/abs/2311.06242</a>
+<a name="footnote7">[7]</a> Xiao, B. et al. (2024). *Florence-2: Advancing a Unified Representation for a Variety of Vision Tasks.* <a href="https://arxiv.org/abs/2311.06242" target="_blank">arxiv.org/abs/2311.06242</a><br>
+<a name="footnote8">[8]</a> Bayes-Genis, A. et al. (2023). *Practical algorithms for early diagnosis of heart failure and heart stress using NT-proBNP.* European Journal of Heart Failure, 25(11), 1891–1898. <a href="https://doi.org/10.1002/ejhf.3036" target="_blank">doi:10.1002/ejhf.3036</a>

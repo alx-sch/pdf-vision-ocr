@@ -1,4 +1,4 @@
-# pdf-vision-ocr
+# DocVision
 
 <p align="center">
   <img src="https://img.shields.io/badge/python-3.9+-blue?logo=python&logoColor=white" alt="Python 3.9+">

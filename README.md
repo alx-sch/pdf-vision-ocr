@@ -546,25 +546,25 @@ it first.
 ## Building a Knowledge Base
 
 This tool is designed as the **foundation layer** for document intelligence pipelines.
-The extracted text files are deliberately plain — `.txt` with lightweight markers — so
+The extracted text files are deliberately plain: `.txt` with lightweight markers, so
 they slot into any downstream workflow:
 
 ```
-  ┌──────────┐     ┌─────────────────┐     ┌──────────────────────┐
-  │  PDFs    │────▶│   DocVision     │────▶│  Structured .txt     │
-  │          │     │  (this tool)    │     │  files               │
-  └──────────┘     └─────────────────┘     └──────────┬───────────┘
-                                                      │
-                          ┌───────────────────────────┤
-                          │               │           │
-                          ▼               ▼           ▼
-                   ┌────────────┐  ┌──────────┐  ┌──────────────┐
-                   │  RAG /     │  │  LLM     │  │  Search      │
-                   │  Vector DB │  │  Analysis │  │  Index       │
-                   └────────────┘  └──────────┘  └──────────────┘
-                   Chunk, embed,   Summarize,     Full-text or
-                   semantic search extract data,   keyword search
-                   over documents  compare docs    across corpus
+  ┌────────┐     ┌───────────────┐     ┌──────────────┐
+  │  PDFs  |────▶│   DocVision   │────▶│  Structured  │
+  └────────┘     │  (this tool)  │     │  .txt files  │
+                 └───────────────┘     └───────┬──────┘
+                                               │
+                          ┌───────────────┬────┴─────────┐
+                          │               │              │
+                          ▼               ▼              ▼
+                   ┌────────────┐   ┌───────────┐   ┌──────────┐
+                   │  RAG /     │   │  LLM      │   │  Search  │
+                   │  Vector DB │   │  Analysis │   │  Index   │
+                   └────────────┘   └───────────┘   └──────────┘
+                   Chunk, embed,     Summarize,      Full-text or
+                   semantic search   extract data,   keyword search
+                   over documents    compare docs    across corpus
 ```
 
 **Some things you can build on top:**
